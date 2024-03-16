@@ -1,0 +1,4 @@
+/Users/robert/CLionProjects/8080-emulator/cmake-build-debug/CMakeFiles/8080Disassembler.dir
+/Users/robert/CLionProjects/8080-emulator/cmake-build-debug/CMakeFiles/8080Emulator.dir
+/Users/robert/CLionProjects/8080-emulator/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/robert/CLionProjects/8080-emulator/cmake-build-debug/CMakeFiles/rebuild_cache.dir
