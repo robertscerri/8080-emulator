@@ -4,6 +4,8 @@
 
 void unimplemented_instruction(state_8080_t *state, unsigned char opcode);
 uint16_t get_2byte_word(uint8_t msb, uint8_t lsb);
+int get_sign_bit(uint8_t num);
+void perform_add(state_8080_t *state, const uint8_t *operand);
 
 void unimplemented_instruction(state_8080_t *state, unsigned char opcode) {
     printf("ERROR: Unimplemented instruction (0x%02x)\n", opcode);
@@ -39,19 +41,20 @@ int emulate_8080(state_8080_t *state) {
         case 0x04:
             state->b++;
             state->flags.z = state->b == 0;
-            state->flags.s = (state->b >> 7) & 0x01;
+            state->flags.s = get_sign_bit(state->b);
             //TODO: Set parity bit
             //TODO: Set aux. carry bit
             break;
         case 0x05:
             state->b--;
             state->flags.z = state->b == 0;
-            state->flags.s = (state->b >> 7) & 0x01;
+            state->flags.s = get_sign_bit(state->b);
             //TODO: Set parity bit
             //TODO: Set aux. carry bit
             break;
         case 0x06:
             state->b = opcode[1];
+            state->pc += 1;
             break;
         case 0x07:
             state->flags.cy = (state->a >> 7) & 0x01;
@@ -292,6 +295,30 @@ int emulate_8080(state_8080_t *state) {
         case 0x7f:
             state->a = state->a;
             break;
+        case 0x80:
+            perform_add(state, &state->b);
+            break;
+        case 0x81:
+            perform_add(state, &state->c);
+            break;
+        case 0x82:
+            perform_add(state, &state->d);
+            break;
+        case 0x83:
+            perform_add(state, &state->e);
+            break;
+        case 0x84:
+            perform_add(state, &state->h);
+            break;
+        case 0x85:
+            perform_add(state, &state->l);
+            break;
+        case 0x86:
+            perform_add(state, state->memory + get_2byte_word(state->h, state->l));
+            break;
+        case 0x87:
+            perform_add(state, &state->a);
+            break;
         default:
             unimplemented_instruction(state, *opcode);
             break;
@@ -302,4 +329,18 @@ int emulate_8080(state_8080_t *state) {
 
 uint16_t get_2byte_word(uint8_t msb, uint8_t lsb) {
     return (msb << 8) | lsb;
+}
+
+int get_sign_bit(uint8_t num) {
+    return (num >> 7) & 0x01;
+}
+
+void perform_add(state_8080_t *state, const uint8_t *operand) {
+    state->a = state->a + *operand;
+
+    state->flags.z = state->a == 0;
+    state->flags.s = get_sign_bit(state->a);
+    //TODO: Add parity bit
+    //TODO: Add carry
+    //TODO: Add auxiliary carry
 }
