@@ -11,7 +11,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Robert/IdeaProjects/8080Disassembler/cmake-build-debug"
+			"value" : "C:/Users/Robert/IdeaProjects/8080-emulator/cmake-build-debug"
 		},
 		{
 			"name" : "8080Disassembler_IS_TOP_LEVEL",
@@ -35,7 +35,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Robert/IdeaProjects/8080Disassembler"
+			"value" : "C:/Users/Robert/IdeaProjects/8080-emulator"
 		},
 		{
 			"name" : "CMAKE_ADDR2LINE",
@@ -91,7 +91,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/Robert/IdeaProjects/8080Disassembler/cmake-build-debug"
+			"value" : "c:/Users/Robert/IdeaProjects/8080-emulator/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -467,7 +467,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Robert/IdeaProjects/8080Disassembler/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "C:/Users/Robert/IdeaProjects/8080-emulator/cmake-build-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -539,7 +539,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/Robert/IdeaProjects/8080Disassembler"
+			"value" : "C:/Users/Robert/IdeaProjects/8080-emulator"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",

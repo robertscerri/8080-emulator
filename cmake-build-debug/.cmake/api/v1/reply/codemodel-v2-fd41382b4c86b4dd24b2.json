@@ -58,8 +58,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/Robert/IdeaProjects/8080Disassembler/cmake-build-debug",
-		"source" : "C:/Users/Robert/IdeaProjects/8080Disassembler"
+		"build" : "C:/Users/Robert/IdeaProjects/8080-emulator/cmake-build-debug",
+		"source" : "C:/Users/Robert/IdeaProjects/8080-emulator"
 	},
 	"version" : 
 	{
