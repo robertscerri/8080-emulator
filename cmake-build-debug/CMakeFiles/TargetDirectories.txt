@@ -1,3 +1,3 @@
-C:/Users/Robert/IdeaProjects/8080Disassembler/cmake-build-debug/CMakeFiles/8080Disassembler.dir
-C:/Users/Robert/IdeaProjects/8080Disassembler/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/Robert/IdeaProjects/8080Disassembler/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/robert/CLionProjects/8080-Disassembler/cmake-build-debug/CMakeFiles/8080Disassembler.dir
+/Users/robert/CLionProjects/8080-Disassembler/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/robert/CLionProjects/8080-Disassembler/cmake-build-debug/CMakeFiles/rebuild_cache.dir

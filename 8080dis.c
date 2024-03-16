@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
 int disassemble_8080(unsigned char *buff, int pc) {
     unsigned char *code = &buff[pc];
     int op_bytes = 1;
-    printf("%04x", pc);
+    printf("%04x ", pc);
 
     switch(*code) {
         case 0x01: printf("LXI B, #%02x%02x", code[2], code[1]); op_bytes = 3; break;
