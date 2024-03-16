@@ -3,7 +3,7 @@
 #include "8080emu.h"
 
 void unimplemented_instruction(state_8080_t *state, unsigned char opcode);
-int get_HL_addr(state_8080_t *state);
+uint16_t get_2byte_word(uint8_t msb, uint8_t lsb);
 
 void unimplemented_instruction(state_8080_t *state, unsigned char opcode) {
     printf("ERROR: Unimplemented instruction (0x%02x)\n", opcode);
@@ -22,13 +22,13 @@ int emulate_8080(state_8080_t *state) {
             break;
         case 0x02:
             {
-                uint16_t addr = (state->b << 8) | state->c;
+                uint16_t addr = get_2byte_word(state->b, state->c);
                 state->memory[addr] = state->a;
                 break;
             }
         case 0x03:
             {
-                uint16_t temp = (state->b << 8) | state->c;
+                uint16_t temp = get_2byte_word(state->b, state->c);
                 temp++;
 
                 state->b = (temp >> 8) & 0xff;
@@ -78,7 +78,8 @@ int emulate_8080(state_8080_t *state) {
             break;
         case 0x46:
             {
-                state->b = state->memory[get_HL_addr(state)];
+                int addr = get_2byte_word(state->h, state->l);
+                state->b = state->memory[addr];
                 break;
             }
         case 0x47:
@@ -104,7 +105,8 @@ int emulate_8080(state_8080_t *state) {
             break;
         case 0x4e:
             {
-                state->c = state->memory[get_HL_addr(state)];
+                int addr = get_2byte_word(state->h, state->l);
+                state->c = state->memory[addr];
                 break;
             }
         case 0x4f:
@@ -130,7 +132,8 @@ int emulate_8080(state_8080_t *state) {
             break;
         case 0x56:
             {
-                state->d = state->memory[get_HL_addr(state)];
+                int addr = get_2byte_word(state->h, state->l);
+                state->d = state->memory[addr];
                 break;
             }
         case 0x57:
@@ -156,7 +159,8 @@ int emulate_8080(state_8080_t *state) {
             break;
         case 0x5e:
             {
-                state->e = state->memory[get_HL_addr(state)];
+                int addr = get_2byte_word(state->h, state->l);
+                state->e = state->memory[addr];
                 break;
             }
         case 0x5f:
@@ -182,7 +186,8 @@ int emulate_8080(state_8080_t *state) {
             break;
         case 0x66:
             {
-                state->h = state->memory[get_HL_addr(state)];
+                int addr = get_2byte_word(state->h, state->l);
+                state->h = state->memory[addr];
                 break;
             }
         case 0x67:
@@ -208,7 +213,8 @@ int emulate_8080(state_8080_t *state) {
             break;
         case 0x6e:
             {
-                state->l = state->memory[get_HL_addr(state)];
+                int addr = get_2byte_word(state->h, state->l);
+                state->l = state->memory[addr];
                 break;
             }
         case 0x6f:
@@ -216,32 +222,38 @@ int emulate_8080(state_8080_t *state) {
             break;
         case 0x70:
             {
-                state->memory[get_HL_addr(state)] = state->b;
+                int addr = get_2byte_word(state->h, state->l);
+                state->memory[addr] = state->b;
                 break;
             }
         case 0x71:
             {
-                state->memory[get_HL_addr(state)] = state->c;
+                int addr = get_2byte_word(state->h, state->l);
+                state->memory[addr] = state->c;
                 break;
             }
         case 0x72:
             {
-                state->memory[get_HL_addr(state)] = state->d;
+                int addr = get_2byte_word(state->h, state->l);
+                state->memory[addr] = state->d;
                 break;
             }
         case 0x73:
             {
-                state->memory[get_HL_addr(state)] = state->e;
+                int addr = get_2byte_word(state->h, state->l);
+                state->memory[addr] = state->e;
                 break;
             }
         case 0x74:
             {
-                state->memory[get_HL_addr(state)] = state->h;
+                int addr = get_2byte_word(state->h, state->l);
+                state->memory[addr] = state->h;
                 break;
             }
         case 0x75:
             {
-                state->memory[get_HL_addr(state)] = state->l;
+                int addr = get_2byte_word(state->h, state->l);
+                state->memory[addr] = state->l;
                 break;
             }
         case 0x76:
@@ -249,7 +261,8 @@ int emulate_8080(state_8080_t *state) {
             break;
         case 0x77:
             {
-                state->memory[get_HL_addr(state)] = state->a;
+                int addr = get_2byte_word(state->h, state->l);
+                state->memory[addr] = state->a;
                 break;
             }
         case 0x78:
@@ -272,7 +285,8 @@ int emulate_8080(state_8080_t *state) {
             break;
         case 0x7e:
             {
-                state->a = state->memory[get_HL_addr(state)];
+                int addr = get_2byte_word(state->h, state->l);
+                state->a = state->memory[addr];
                 break;
             }
         case 0x7f:
@@ -286,6 +300,6 @@ int emulate_8080(state_8080_t *state) {
     state->pc++;
 }
 
-int get_HL_addr(state_8080_t *state) {
-    return (state->h << 8) | state->l;
+uint16_t get_2byte_word(uint8_t msb, uint8_t lsb) {
+    return (msb << 8) | lsb;
 }
