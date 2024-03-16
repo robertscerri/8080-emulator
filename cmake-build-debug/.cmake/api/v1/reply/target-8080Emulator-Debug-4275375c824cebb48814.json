@@ -2,7 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "8080Emulator"
+			"path" : "8080Emulator.exe"
+		},
+		{
+			"path" : "8080Emulator.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -35,7 +38,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-g -std=gnu11 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fcolor-diagnostics"
+					"fragment" : "-g -std=gnu11 -fdiagnostics-color=always"
 				}
 			],
 			"language" : "C",
@@ -65,12 +68,16 @@
 			{
 				"fragment" : "",
 				"role" : "flags"
+			},
+			{
+				"fragment" : "-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32",
+				"role" : "libraries"
 			}
 		],
 		"language" : "C"
 	},
 	"name" : "8080Emulator",
-	"nameOnDisk" : "8080Emulator",
+	"nameOnDisk" : "8080Emulator.exe",
 	"paths" : 
 	{
 		"build" : ".",
