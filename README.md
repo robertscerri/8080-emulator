@@ -1,2 +1,2 @@
-# 8080-Disassembler
-A simple 8080 disassembler
+# 8080-emulator
+A simple 8080 emulator.
