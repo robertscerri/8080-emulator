@@ -715,7 +715,13 @@ void emulate_8080(state_8080_t *state) {
                 state->pc = addr;
                 break;
             }
-        //TODO: Implement opcode 0xc4
+        case 0xc4:
+            if (state->flags.z == 0) {
+                perform_call(state, get_2byte_word(opcode[2], opcode[1]));
+            } else {
+                state->pc += 2;
+            }
+            break;
         case 0xc5:
             state->memory[state->sp] = state->c;
             state->memory[state->sp - 1] = state->b;
@@ -744,7 +750,14 @@ void emulate_8080(state_8080_t *state) {
                 }
                 break;
             }
-        //TODO: Implement opcodes 0xcb -> 0xcc
+        //TODO: Implement opcode 0xcb
+        case 0xcc:
+            if (state->flags.z == 1) {
+                perform_call(state, get_2byte_word(opcode[2], opcode[1]));
+            } else {
+                state->pc += 2;
+            }
+            break;
         case 0xcd:
             perform_call(state, get_2byte_word(opcode[2], opcode[1]));
             break;
@@ -773,7 +786,14 @@ void emulate_8080(state_8080_t *state) {
                 }
                 break;
             }
-        //TODO: Implement opcodes 0xd3 -> 0xd4
+        //TODO: Implement opcode 0xd3
+        case 0xd4:
+            if (state->flags.cy == 0) {
+                perform_call(state, get_2byte_word(opcode[2], opcode[1]));
+            } else {
+                state->pc += 2;
+            }
+            break;
         case 0xd5:
             state->memory[state->sp] = state->c;
             state->memory[state->sp - 1] = state->b;
@@ -796,7 +816,15 @@ void emulate_8080(state_8080_t *state) {
                 }
                 break;
             }
-        //TODO: Implement opcodes 0xdb -> 0xdf
+        //TODO: Implement opcode 0xdb
+        case 0xdc:
+            if (state->flags.cy == 1) {
+                perform_call(state, get_2byte_word(opcode[2], opcode[1]));
+            } else {
+                state->pc += 2;
+            }
+            break;
+        //TODO: Implement opcodes 0xdd -> 0xdf
         case 0xe0:
             if (state->flags.p == 0) {
                 perform_ret(state);
@@ -828,7 +856,13 @@ void emulate_8080(state_8080_t *state) {
                 state->h = temp;
                 break;
             }
-        //TODO: Implement opcode -> 0xe4
+        case 0xe4:
+            if (state->flags.p == 0) {
+                perform_call(state, get_2byte_word(opcode[2], opcode[1]));
+            } else {
+                state->pc += 2;
+            }
+            break;
         case 0xe5:
             state->memory[state->sp] = state->h;
             state->memory[state->sp - 1] = state->l;
@@ -862,7 +896,14 @@ void emulate_8080(state_8080_t *state) {
                 state->h = temp;
                 break;
             }
-        //TODO: Implement opcodes 0xec -> 0xef
+        case 0xec:
+            if (state->flags.p == 1) {
+                perform_call(state, get_2byte_word(opcode[2], opcode[1]));
+            } else {
+                state->pc += 2;
+            }
+            break;
+        //TODO: Implement opcodes 0xed -> 0xef
         case 0xf0:
             if (state->flags.s == 0) {
                 perform_ret(state);
@@ -893,6 +934,13 @@ void emulate_8080(state_8080_t *state) {
         case 0xf3:
             state->int_enable = 0;
             break;
+        case 0xf4:
+            if (state->flags.s == 0) {
+                perform_call(state, get_2byte_word(opcode[2], opcode[1]));
+            } else {
+                state->pc += 2;
+            }
+            break;
         //TODO: Implement opcodes 0xf4 -> 0xf7
         case 0xf8:
             if (state->flags.s == 1) {
@@ -915,7 +963,14 @@ void emulate_8080(state_8080_t *state) {
         case 0xfb:
             state->int_enable = 1;
             break;
-        //TODO: Implement opcodes 0xfc -> 0xff
+        case 0xfc:
+            if (state->flags.s == 1) {
+                perform_call(state, get_2byte_word(opcode[2], opcode[1]));
+            } else {
+                state->pc += 2;
+            }
+            break;
+        //TODO: Implement opcodes 0xfd -> 0xff
         default:
             unimplemented_instruction(state, *opcode);
             break;
