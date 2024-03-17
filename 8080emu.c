@@ -122,7 +122,24 @@ int emulate_8080(state_8080_t *state) {
                 state->flags.cy = prevBit7;
                 break;
             }
-        //TODO: Implement opcodes 0x19 -> 0x3f
+        //TODO: Implement opcode 0x19
+        case 0x1a:
+            perform_ldax(state, state->d, state->e);
+            break;
+        case 0x1b:
+            perform_dcx(state, &state->d, &state->e);
+            break;
+        case 0x1c:
+            perform_inr(state, &state->e);
+            break;
+        case 0x1d:
+            perform_dcr(state, &state->e);
+            break;
+        case 0x1e:
+            state->e = opcode[1];
+            state->pc += 1;
+            break;
+        //TODO: Implement opcodes 0x1f -> 0x3f
         case 0x40:
             state->b = state->b;
             break;
