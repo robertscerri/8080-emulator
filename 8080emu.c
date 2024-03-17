@@ -793,7 +793,18 @@ void emulate_8080(state_8080_t *state) {
                 }
                 break;
             }
-        //TODO: Implement opcodes 0xeb -> 0xf0
+        case 0xeb:
+            {
+                int temp = state->e;
+                state->e = state->l;
+                state->l = temp;
+
+                temp = state->d;
+                state->d = state->h;
+                state->h = temp;
+                break;
+            }
+        //TODO: Implement opcodes 0xec -> 0xf0
         case 0xf1:
             {
                 uint8_t psw = state->memory[state->sp];
