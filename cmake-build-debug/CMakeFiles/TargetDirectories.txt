@@ -1,4 +1,0 @@
-C:/Users/Robert/IdeaProjects/8080-emulator/cmake-build-debug/CMakeFiles/8080Disassembler.dir
-C:/Users/Robert/IdeaProjects/8080-emulator/cmake-build-debug/CMakeFiles/8080Emulator.dir
-C:/Users/Robert/IdeaProjects/8080-emulator/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/Robert/IdeaProjects/8080-emulator/cmake-build-debug/CMakeFiles/rebuild_cache.dir
