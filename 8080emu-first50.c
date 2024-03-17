@@ -912,9 +912,12 @@ int main (int argc, char**argv)
 	ReadFileIntoMemoryAt(state, "invaders.f", 0x1000);
 	ReadFileIntoMemoryAt(state, "invaders.e", 0x1800);
 
-	while (done == 0)
+    int instructionsProcessed = 0;
+
+	while (done == 0 && instructionsProcessed < 50)
 	{
 		done = Emulate8080Op(state);
+        instructionsProcessed++;
 	}
 	return 0;
 }

@@ -1346,7 +1346,7 @@ void perform_dcr(state_8080_t *state, const uint8_t *reg) {
 }
 
 void perform_inx(state_8080_t *state, uint8_t *msb, uint8_t *lsb) {
-    uint16_t result = get_2byte_word(state->b, state->c);
+    uint16_t result = get_2byte_word(*msb, *lsb);
     result++;
 
     *msb = (result >> 8) & 0xff;
@@ -1354,7 +1354,7 @@ void perform_inx(state_8080_t *state, uint8_t *msb, uint8_t *lsb) {
 }
 
 void perform_dcx(state_8080_t *state, uint8_t *msb, uint8_t *lsb) {
-    uint16_t result = get_2byte_word(state->b, state->c);
+    uint16_t result = get_2byte_word(*msb, *lsb);
     result--;
 
     *msb = (result >> 8) & 0xff;
@@ -1509,8 +1509,11 @@ int main(void) {
     fread_to_mem(state, "invaders.f", 0x1000);
     fread_to_mem(state, "invaders.e", 0x1800);
 
-    while (done == 0) {
+    int instructionsProcessed = 0;
+
+    while (done == 0 && instructionsProcessed < 50) {
         done = emulate_8080(state);
+        instructionsProcessed++;
     }
 
     free(state->memory);
