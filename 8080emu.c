@@ -5,6 +5,7 @@
 void unimplemented_instruction(state_8080_t *state, unsigned char opcode);
 uint16_t get_2byte_word(uint8_t msb, uint8_t lsb);
 int get_sign_bit(uint8_t num);
+int get_parity_bit(uint8_t num);
 void perform_add(state_8080_t *state, const uint8_t *operand);
 
 void unimplemented_instruction(state_8080_t *state, unsigned char opcode) {
@@ -42,14 +43,14 @@ int emulate_8080(state_8080_t *state) {
             state->b++;
             state->flags.z = state->b == 0;
             state->flags.s = get_sign_bit(state->b);
-            //TODO: Set parity bit
+            state->flags.p = get_parity_bit(state->b);
             //TODO: Set aux. carry bit
             break;
         case 0x05:
             state->b--;
             state->flags.z = state->b == 0;
             state->flags.s = get_sign_bit(state->b);
-            //TODO: Set parity bit
+            state->flags.p = get_parity_bit(state->b);
             //TODO: Set aux. carry bit
             break;
         case 0x06:
@@ -335,12 +336,24 @@ int get_sign_bit(uint8_t num) {
     return (num >> 7) & 0x01;
 }
 
-void perform_add(state_8080_t *state, const uint8_t *operand) {
-    state->a = state->a + *operand;
+int get_parity_bit(uint8_t num) {
+    int parity = 1;
 
-    state->flags.z = state->a == 0;
+    while (num) {
+        parity ^= (num & 1);
+        num >>= 1;
+    }
+
+    return parity;
+}
+
+void perform_add(state_8080_t *state, const uint8_t *operand) {
+    uint16_t tempRes = (uint16_t) state->a + (uint16_t) *operand;
+    state->a = (uint8_t) (tempRes & 0xff);
+
+    state->flags.z = state->a == 0 ? 1 : 0;
     state->flags.s = get_sign_bit(state->a);
-    //TODO: Add parity bit
-    //TODO: Add carry
-    //TODO: Add auxiliary carry
+    state->flags.p = get_parity_bit(state->a);
+    state->flags.cy = tempRes > UINT8_MAX ? 1 : 0;
+    //TODO: Add auxiliary carry bit
 }
