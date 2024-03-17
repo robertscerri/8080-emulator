@@ -139,7 +139,16 @@ void emulate_8080(state_8080_t *state) {
             state->e = opcode[1];
             state->pc += 1;
             break;
-        //TODO: Implement opcodes 0x1f -> 0x20
+        case 0x1f:
+            {
+                uint8_t prevBit0 = state->a & 0x01;
+                uint8_t prevBit7 = state->a & 0x80;
+                state->a = state->a >> 1;
+                state->a = state->a | prevBit7;
+                state->flags.cy = prevBit0;
+                break;
+            }
+        //TODO: Implement opcode 0x20 (RIM)
         case 0x21:
             state->h = opcode[1];
             state->l = opcode[2];
@@ -176,7 +185,7 @@ void emulate_8080(state_8080_t *state) {
         case 0x2f:
             state->a = ~state->a;
             break;
-        //TODO: Implement opcode 0x30
+        //TODO: Implement opcode 0x30 (SIM)
         case 0x31:
             state->sp = (opcode[2] << 8) | opcode[1];
             state->pc += 2;
