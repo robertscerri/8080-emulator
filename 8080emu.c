@@ -19,7 +19,8 @@ void perform_sbb(state_8080_t *state, const uint8_t *operand);
 //Logical Group
 void perform_ana(state_8080_t *state, const uint8_t *operand);
 void perform_xra(state_8080_t *state, const uint8_t *operand);
-void perform_ora(state_8080_t *state, const uint8_t *operand)
+void perform_ora(state_8080_t *state, const uint8_t *operand);
+void perform_cmp(state_8080_t *state, const uint8_t *operand);
 
 void unimplemented_instruction(state_8080_t *state, unsigned char opcode) {
     printf("ERROR: Unimplemented instruction (0x%02x)\n", opcode);
@@ -480,6 +481,30 @@ int emulate_8080(state_8080_t *state) {
         case 0xb7:
             perform_ora(state, &state->a);
             break;
+        case 0xb8:
+            perform_cmp(state, &state->b);
+            break;
+        case 0xb9:
+            perform_cmp(state, &state->c);
+            break;
+        case 0xba:
+            perform_cmp(state, &state->d);
+            break;
+        case 0xbb:
+            perform_cmp(state, &state->e);
+            break;
+        case 0xbc:
+            perform_cmp(state, &state->h);
+            break;
+        case 0xbd:
+            perform_cmp(state, &state->l);
+            break;
+        case 0xbe:
+            perform_cmp(state, state->memory + get_2byte_word(state->h, state->l));
+            break;
+        case 0xbf:
+            perform_cmp(state, &state->a);
+            break;
         default:
             unimplemented_instruction(state, *opcode);
             break;
@@ -575,5 +600,15 @@ void perform_ora(state_8080_t *state, const uint8_t *operand) {
     state->flags.s = get_sign_bit(state->a);
     state->flags.p = get_parity_bit(state->a);
     state->flags.cy = 0;
+    //TODO: Add auxiliary carry bit
+}
+
+void perform_cmp(state_8080_t *state, const uint8_t *operand) {
+    uint16_t result = (uint16_t) state->a - (uint16_t) *operand;
+
+    state->flags.z = (result & 0xff) == 0 ? 1 : 0;
+    state->flags.s = get_sign_bit((result & 0xff));
+    state->flags.p = get_parity_bit((result & 0xff));
+    state->flags.cy = result > UINT8_MAX ? 0 : 1; //Borrow In is complement of Carry Out //TODO: Verify correctness of this statement
     //TODO: Add auxiliary carry bit
 }
