@@ -32,6 +32,8 @@ void perform_xra(state_8080_t *state, const uint8_t operand);
 void perform_ora(state_8080_t *state, const uint8_t operand);
 void perform_cmp(state_8080_t *state, const uint8_t operand);
 
+void perform_ret(state_8080_t *state);
+
 void unimplemented_instruction(state_8080_t *state, unsigned char opcode) {
     printf("ERROR: Unimplemented instruction (0x%02x)\n", opcode);
     exit(1);
@@ -689,7 +691,11 @@ void emulate_8080(state_8080_t *state) {
         case 0xbf:
             perform_cmp(state, state->a);
             break;
-        //TODO: Implement opcode 0xc0
+        case 0xc0:
+            if (state->flags.z == 0) {
+                perform_ret(state);
+            }
+            break;
         case 0xc1:
             state->c = state->memory[state->sp];
             state->b = state->memory[state->sp + 1];
@@ -715,7 +721,19 @@ void emulate_8080(state_8080_t *state) {
             state->memory[state->sp - 1] = state->b;
             state->sp -= 2;
             break;
-        //TODO: Implement opcodes 0xc6 -> 0xc9
+        case 0xc6:
+            perform_add(state, opcode[1]);
+            state->pc += 1;
+            break;
+        //TODO: Implement opcode 0xc7
+        case 0xc8:
+            if (state->flags.z == 1) {
+                perform_ret(state);
+            }
+            break;
+        case 0xc9:
+            perform_ret(state);
+            break;
         case 0xca:
             {
                 if (state->flags.z == 1) {
@@ -724,7 +742,12 @@ void emulate_8080(state_8080_t *state) {
                 }
                 break;
             }
-        //TODO: Implement opcodes 0xcb -> 0xd0
+        //TODO: Implement opcodes 0xcb -> 0xcf
+        case 0xd0:
+            if (state->flags.cy == 0) {
+                perform_ret(state);
+            }
+            break;
         case 0xd1:
             state->d = state->memory[state->sp];
             state->e = state->memory[state->sp + 1];
@@ -744,7 +767,13 @@ void emulate_8080(state_8080_t *state) {
             state->memory[state->sp - 1] = state->b;
             state->sp -= 2;
             break;
-        //TODO: Implement opcodes 0xd6 -> 0xd9
+        //TODO: Implement opcodes 0xd6 -> 0xd7
+        case 0xd8:
+            if (state->flags.cy == 1) {
+                perform_ret(state);
+            }
+            break;
+        //TODO: Implement opcode 0xd9
         case 0xda:
             {
                 if (state->flags.cy == 1) {
@@ -753,7 +782,12 @@ void emulate_8080(state_8080_t *state) {
                 }
                 break;
             }
-        //TODO: Implement opcodes 0xdb -> 0xe0
+        //TODO: Implement opcodes 0xdb -> 0xdf
+        case 0xe0:
+            if (state->flags.p == 0) {
+                perform_ret(state);
+            }
+            break;
         case 0xe1:
             state->h = state->memory[state->sp];
             state->l = state->memory[state->sp + 1];
@@ -784,7 +818,13 @@ void emulate_8080(state_8080_t *state) {
             state->memory[state->sp - 1] = state->l;
             state->sp -= 2;
             break;
-        //TODO: Implement opcodes 0xe6 -> 0xe9
+        //TODO: Implement opcodes 0xe6 -> 0xe7
+        case 0xe8:
+            if (state->flags.p == 1) {
+                perform_ret(state);
+            }
+            break;
+        //TODO: Implement opcode 0xe9
         case 0xea:
             {
                 if (state->flags.p == 1) {
@@ -804,7 +844,12 @@ void emulate_8080(state_8080_t *state) {
                 state->h = temp;
                 break;
             }
-        //TODO: Implement opcodes 0xec -> 0xf0
+        //TODO: Implement opcodes 0xec -> 0xef
+        case 0xf0:
+            if (state->flags.s == 0) {
+                perform_ret(state);
+            }
+            break;
         case 0xf1:
             {
                 uint8_t psw = state->memory[state->sp];
@@ -828,7 +873,12 @@ void emulate_8080(state_8080_t *state) {
         case 0xf3:
             state->int_enable = 0;
             break;
-        //TODO: Implement opcodes 0xf4 -> 0xf8
+        //TODO: Implement opcodes 0xf4 -> 0xf7
+        case 0xf8:
+            if (state->flags.s == 1) {
+                perform_ret(state);
+            }
+            break;
         case 0xf9:
             state->sp = get_2byte_word(state->h, state->l);
             break;
@@ -1007,4 +1057,9 @@ void perform_cmp(state_8080_t *state, const uint8_t operand) {
     state->flags.p = get_parity_bit((result & 0xff));
     state->flags.cy = result > UINT8_MAX ? 0 : 1; //Borrow In is complement of Carry Out //TODO: Verify correctness of this statement
     //TODO: Add auxiliary carry bit
+}
+
+void perform_ret(state_8080_t *state) {
+    state->pc = get_2byte_word(state->memory[state->sp + 1], state->memory[state->sp]);
+    state->sp += 2;
 }
