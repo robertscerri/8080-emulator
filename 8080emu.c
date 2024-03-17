@@ -61,9 +61,13 @@ int emulate_8080(state_8080_t *state) {
             state->pc += 1;
             break;
         case 0x07:
-            state->flags.cy = (state->a >> 7) & 0x01;
-            state->a = ((state->a << 1) && 0xff) + state->flags.cy;
-            break;
+            {
+                uint8_t prevBit7 = state->a & 0x80;
+                state->a = state->a << 1;
+                state->a = state->a | prevBit7;
+                state->flags.cy = prevBit7;
+                break;
+            }
         //TODO: Implement opcode 0x09
         case 0x0a:
             perform_ldax(state, state->b, state->c);
@@ -81,7 +85,14 @@ int emulate_8080(state_8080_t *state) {
             state->c = opcode[1];
             state->pc += 1;
             break;
-        //TODO: Implement opcode 0x0f
+        case 0x0f:
+            {
+                uint8_t prevBit0 = state->a & 0x01;
+                state->a = state->a >> 1;
+                state->a = state->a | (prevBit0 << 7);
+                state->flags.cy = prevBit0;
+                break;
+            }
         case 0x11:
             state->e = opcode[1];
             state->d = opcode[2];
@@ -103,7 +114,15 @@ int emulate_8080(state_8080_t *state) {
             state->d = opcode[1];
             state->pc += 1;
             break;
-        //TODO: Implement opcodes 0x17 -> 0x3f
+        case 0x17:
+            {
+                uint8_t prevBit7 = state->a & 0x80;
+                state->a = state->a << 1;
+                state->a = state->a | (state->flags.cy & 0x01);
+                state->flags.cy = prevBit7;
+                break;
+            }
+        //TODO: Implement opcodes 0x19 -> 0x3f
         case 0x40:
             state->b = state->b;
             break;
