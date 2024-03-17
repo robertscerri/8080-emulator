@@ -874,7 +874,11 @@ void emulate_8080(state_8080_t *state) {
             state->memory[state->sp - 1] = state->l;
             state->sp -= 2;
             break;
-        //TODO: Implement opcodes 0xe6 -> 0xe7
+        case 0xe6:
+            perform_ana(state, opcode[1]);
+            state->pc += 1;
+            break;
+        //TODO: Implement opcode 0xe7
         case 0xe8:
             if (state->flags.p == 1) {
                 perform_ret(state);
