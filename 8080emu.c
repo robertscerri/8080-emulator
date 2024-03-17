@@ -704,7 +704,16 @@ void emulate_8080(state_8080_t *state) {
                 state->pc = addr;
                 break;
             }
-        //TODO: Implement opcodes 0xc4 -> 0xf2
+        //TODO: Implement opcodes 0xc4 -> 0xc9
+        case 0xc9:
+            {
+                if (state->flags.z == 0) {
+                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    state->pc = addr;
+                }
+                break;
+            }
+        //TODO: Implement opcodes 0xcb -> 0xf2
         case 0xf3:
             state->int_enable = 0;
             break;
