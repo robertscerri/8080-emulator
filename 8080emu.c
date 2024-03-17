@@ -33,6 +33,7 @@ void perform_ora(state_8080_t *state, const uint8_t operand);
 void perform_cmp(state_8080_t *state, const uint8_t operand);
 
 void perform_ret(state_8080_t *state);
+void perform_call(state_8080_t *state, uint16_t addr);
 
 void unimplemented_instruction(state_8080_t *state, unsigned char opcode) {
     printf("ERROR: Unimplemented instruction (0x%02x)\n", opcode);
@@ -165,7 +166,7 @@ void emulate_8080(state_8080_t *state) {
             break;
         case 0x22:
             {
-                uint16_t addr = opcode[1] | (opcode[2] << 8);
+                uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                 state->memory[addr] = state->l;
                 state->memory[addr + 1] = state->h;
                 state->pc += 2;
@@ -190,7 +191,7 @@ void emulate_8080(state_8080_t *state) {
             break;
         case 0x2a:
             {
-                uint16_t addr = opcode[1] | (opcode[2] << 8);
+                uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                 state->l = state->memory[addr];
                 state->h = state->memory[addr + 1];
                 state->pc += 2;
@@ -214,12 +215,12 @@ void emulate_8080(state_8080_t *state) {
             break;
         //TODO: Implement opcode 0x30 (SIM)
         case 0x31:
-            state->sp = (opcode[2] << 8) | opcode[1];
+            state->sp = get_2byte_word(opcode[2], opcode[1]);
             state->pc += 2;
             break;
         case 0x32:
             {
-                uint16_t addr = opcode[1] | (opcode[2] << 8);
+                uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                 state->memory[addr] = state->a;
                 state->pc += 2;
                 break;
@@ -704,14 +705,14 @@ void emulate_8080(state_8080_t *state) {
         case 0xc2:
             {
                 if (state->flags.z == 0) {
-                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
                 }
                 break;
             }
         case 0xc3:
             {
-                uint16_t addr = opcode[1] | (opcode[2] << 8);
+                uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                 state->pc = addr;
                 break;
             }
@@ -737,12 +738,20 @@ void emulate_8080(state_8080_t *state) {
         case 0xca:
             {
                 if (state->flags.z == 1) {
-                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
                 }
                 break;
             }
-        //TODO: Implement opcodes 0xcb -> 0xcf
+        //TODO: Implement opcodes 0xcb -> 0xcc
+        case 0xcd:
+            perform_call(state, get_2byte_word(opcode[2], opcode[1]));
+            break;
+        case 0xce:
+            perform_adc(state, opcode[1]);
+            state->pc += 1;
+            break;
+        //TODO: Implement opcode 0xcf
         case 0xd0:
             if (state->flags.cy == 0) {
                 perform_ret(state);
@@ -756,7 +765,7 @@ void emulate_8080(state_8080_t *state) {
         case 0xd2:
             {
                 if (state->flags.cy == 0) {
-                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
                 }
                 break;
@@ -777,7 +786,7 @@ void emulate_8080(state_8080_t *state) {
         case 0xda:
             {
                 if (state->flags.cy == 1) {
-                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
                 }
                 break;
@@ -796,7 +805,7 @@ void emulate_8080(state_8080_t *state) {
         case 0xe2:
             {
                 if (state->flags.p == 0) {
-                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
                 }
                 break;
@@ -828,7 +837,7 @@ void emulate_8080(state_8080_t *state) {
         case 0xea:
             {
                 if (state->flags.p == 1) {
-                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
                 }
                 break;
@@ -865,7 +874,7 @@ void emulate_8080(state_8080_t *state) {
         case 0xf2:
             {
                 if (state->flags.s == 0) {
-                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
                 }
                 break;
@@ -885,7 +894,7 @@ void emulate_8080(state_8080_t *state) {
         case 0xfa:
             {
                 if (state->flags.s == 1) {
-                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
                 }
                 break;
@@ -1062,4 +1071,11 @@ void perform_cmp(state_8080_t *state, const uint8_t operand) {
 void perform_ret(state_8080_t *state) {
     state->pc = get_2byte_word(state->memory[state->sp + 1], state->memory[state->sp]);
     state->sp += 2;
+}
+
+void perform_call(state_8080_t *state, uint16_t addr) {
+    state->memory[state->sp - 1] = (state->pc & 0xff00) >> 8;
+    state->memory[state->sp - 2] = (state->pc & 0xff);
+    state->sp += 2;
+    state->pc = addr;
 }
