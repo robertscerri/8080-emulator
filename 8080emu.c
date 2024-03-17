@@ -689,7 +689,22 @@ void emulate_8080(state_8080_t *state) {
         case 0xbf:
             perform_cmp(state, state->a);
             break;
-        //TODO: Implement opcodes 0xc0 -> 0xf2
+        //TODO: Implement opcodes 0xc0 -> 0xc1
+        case 0xc2:
+            {
+                if (state->flags.z != 0) {
+                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    state->pc = addr;
+                }
+                break;
+            }
+        case 0xc3:
+            {
+                uint16_t addr = opcode[1] | (opcode[2] << 8);
+                state->pc = addr;
+                break;
+            }
+        //TODO: Implement opcodes 0xc4 -> 0xf2
         case 0xf3:
             state->int_enable = 0;
             break;
