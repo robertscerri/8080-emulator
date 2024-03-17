@@ -786,7 +786,10 @@ void emulate_8080(state_8080_t *state) {
                 }
                 break;
             }
-        //TODO: Implement opcode 0xd3
+        case 0xd3:
+            //TODO: Add logic for OUT D8 (0xd3)
+            state->pc += 1;
+            break;
         case 0xd4:
             if (state->flags.cy == 0) {
                 perform_call(state, get_2byte_word(opcode[2], opcode[1]));
@@ -816,7 +819,10 @@ void emulate_8080(state_8080_t *state) {
                 }
                 break;
             }
-        //TODO: Implement opcode 0xdb
+        case 0xdb:
+            //TODO: Add logic for IN D8 (0xd3)
+            state->pc += 1;
+            break;
         case 0xdc:
             if (state->flags.cy == 1) {
                 perform_call(state, get_2byte_word(opcode[2], opcode[1]));
