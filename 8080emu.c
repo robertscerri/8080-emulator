@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "8080emu.h"
 
+#include <_mingw_stat64.h>
+
 void unimplemented_instruction(state_8080_t *state, unsigned char opcode);
 
 uint16_t get_2byte_word(uint8_t msb, uint8_t lsb);
@@ -22,6 +24,7 @@ void perform_add(state_8080_t *state, const uint8_t operand);
 void perform_adc(state_8080_t *state, const uint8_t operand);
 void perform_sub(state_8080_t *state, const uint8_t operand);
 void perform_sbb(state_8080_t *state, const uint8_t operand);
+void perform_dad(state_8080_t *state, const uint16_t operand);
 
 //Logical Group
 void perform_ana(state_8080_t *state, const uint8_t operand);
@@ -68,7 +71,9 @@ void emulate_8080(state_8080_t *state) {
                 state->flags.cy = prevBit7;
                 break;
             }
-        //TODO: Implement opcode 0x09
+        case 0x09:
+            perform_dad(state, get_2byte_word(state->b, state->c));
+            break;
         case 0x0a:
             perform_ldax(state, state->b, state->c);
             break;
@@ -122,7 +127,9 @@ void emulate_8080(state_8080_t *state) {
                 state->flags.cy = prevBit7;
                 break;
             }
-        //TODO: Implement opcode 0x19
+        case 0x19:
+            perform_dad(state, get_2byte_word(state->d, state->e));
+            break;
         case 0x1a:
             perform_ldax(state, state->d, state->e);
             break;
@@ -154,7 +161,14 @@ void emulate_8080(state_8080_t *state) {
             state->l = opcode[2];
             state->pc += 2;
             break;
-        //TODO: Implement opcode 0x22
+        case 0x22:
+            {
+                uint16_t addr = opcode[1] | (opcode[2] << 8);
+                state->memory[addr] = state->l;
+                state->memory[addr + 1] = state->h;
+                state->pc += 2;
+                break;
+            }
         case 0x23:
             perform_inx(state, &state->h, &state->l);
             break;
@@ -168,7 +182,18 @@ void emulate_8080(state_8080_t *state) {
             state->h = opcode[1];
             state->pc += 1;
             break;
-        //TODO: Implement opcodes 0x27 -> 0x2a
+        //TODO: Implement opcode 0x27
+        case 0x29:
+            perform_dad(state, get_2byte_word(state->h, state->l));
+            break;
+        case 0x2a:
+            {
+                uint16_t addr = opcode[1] | (opcode[2] << 8);
+                state->l = state->memory[addr];
+                state->h = state->memory[addr + 1];
+                state->pc += 2;
+                break;
+            }
         case 0x2b:
             perform_dcx(state, &state->h, &state->l);
             break;
@@ -190,7 +215,42 @@ void emulate_8080(state_8080_t *state) {
             state->sp = (opcode[2] << 8) | opcode[1];
             state->pc += 2;
             break;
-        //TODO: Implement opcodes 0x32 -> 0x3f
+        case 0x32:
+            {
+                uint16_t addr = opcode[1] | (opcode[2] << 8);
+                state->memory[addr] = state->a;
+                state->pc += 2;
+                break;
+            }
+        case 0x33:
+            state->sp++;
+            break;
+        case 0x34:
+            state->memory[get_2byte_word(state->h, state->l)]++;
+            break;
+        case 0x35:
+            state->memory[get_2byte_word(state->h, state->l)]--;
+            break;
+        case 0x36:
+            state->memory[get_2byte_word(state->h, state->l)] = opcode[1];
+            state->pc += 1;
+            break;
+        case 0x37:
+            state->flags.cy = 1;
+            break;
+        case 0x39:
+            perform_dad(state, state->sp);
+            break;
+        case 0x3a:
+            {
+                uint16_t addr = opcode[1] | (opcode[2] << 8);
+                state->a = state->memory[addr];
+                state->pc += 2;
+                break;
+            }
+        case 0x3b:
+            state->sp--;
+            break;
         case 0x3c:
             perform_inr(state, &state->a);
             break;
@@ -751,6 +811,19 @@ void perform_sbb(state_8080_t *state, const uint8_t operand) {
     state->flags.p = get_parity_bit(state->a);
     state->flags.cy = result > UINT8_MAX ? 0 : 1; //Borrow In is complement of Carry Out //TODO: Verify correctness of this statement
     //TODO: Add auxiliary carry bit
+}
+
+void perform_dad(state_8080_t *state, const uint16_t operand) {
+    uint16_t contentsHL = get_2byte_word(state->h, state->l);
+    uint32_t result = (uint32_t) contentsHL + (uint32_t) operand;
+
+    state->h = (uint8_t) ((result & 0xff00) >> 8);
+    state->l = (uint8_t) (result & 0xff);
+
+    state->flags.z = result == 0 ? 1 : 0;
+    state->flags.s = get_sign_bit(result);
+    state->flags.p = get_parity_bit(result);
+    state->flags.cy = result > UINT16_MAX ? 1 : 0;
 }
 
 void perform_ana(state_8080_t *state, const uint8_t operand) {
