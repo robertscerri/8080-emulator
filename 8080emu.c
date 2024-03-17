@@ -38,7 +38,7 @@ void unimplemented_instruction(state_8080_t *state, unsigned char opcode) {
     exit(1);
 }
 
-int Disassemble8080Op(unsigned char *codebuffer, int pc)
+int disassemble_8080(unsigned char *codebuffer, int pc)
 {
     unsigned char *code = &codebuffer[pc];
     int opbytes = 1;
@@ -324,7 +324,7 @@ int Disassemble8080Op(unsigned char *codebuffer, int pc)
 int emulate_8080(state_8080_t *state) {
     unsigned char *opcode = &state->memory[state->pc];
 
-    Disassemble8080Op(state->memory, state->pc);
+    disassemble_8080(state->memory, state->pc);
 
     state->pc++;
 
@@ -1037,7 +1037,6 @@ int emulate_8080(state_8080_t *state) {
                 }
                 break;
             }
-        //TODO: Implement opcode 0xcb
         case 0xcc:
             if (state->flags.z == 1) {
                 perform_call(state, get_2byte_word(opcode[2], opcode[1]));
@@ -1089,13 +1088,16 @@ int emulate_8080(state_8080_t *state) {
             state->memory[state->sp - 1] = state->d;
             state->sp -= 2;
             break;
-        //TODO: Implement opcodes 0xd6 -> 0xd7
+        case 0xd6:
+            perform_sub(state, opcode[1]);
+            state->pc += 1;
+            break;
+        //TODO: Implement opcode 0xd7
         case 0xd8:
             if (state->flags.cy == 1) {
                 perform_ret(state);
             }
             break;
-        //TODO: Implement opcode 0xd9
         case 0xda:
             {
                 if (state->flags.cy == 1) {
@@ -1117,7 +1119,11 @@ int emulate_8080(state_8080_t *state) {
                 state->pc += 2;
             }
             break;
-        //TODO: Implement opcodes 0xdd -> 0xdf
+        case 0xde:
+            perform_sbb(state, opcode[1]);
+            state->pc += 1;
+            break;
+        //TODO: Implement opcode 0xdf
         case 0xe0:
             if (state->flags.p == 0) {
                 perform_ret(state);
@@ -1171,7 +1177,9 @@ int emulate_8080(state_8080_t *state) {
                 perform_ret(state);
             }
             break;
-        //TODO: Implement opcode 0xe9
+        case 0xe9:
+            state->pc = get_2byte_word(state->h, state->l);
+            break;
         case 0xea:
             {
                 if (state->flags.p == 1) {
@@ -1200,7 +1208,11 @@ int emulate_8080(state_8080_t *state) {
                 state->pc += 2;
             }
             break;
-        //TODO: Implement opcodes 0xed -> 0xef
+        case 0xee:
+            perform_xra(state, opcode[1]);
+            state->pc += 1;
+            break;
+        //TODO: Implement opcode 0xef
         case 0xf0:
             if (state->flags.s == 0) {
                 perform_ret(state);
@@ -1246,7 +1258,11 @@ int emulate_8080(state_8080_t *state) {
                 state->sp -= 2;
                 break;
             }
-        //TODO: Implement opcodes 0xf6 -> 0xf7
+        case 0xf6:
+            perform_ora(state, opcode[1]);
+            state->pc += 1;
+            break;
+        //TODO: Implement opcode 0xf7
         case 0xf8:
             if (state->flags.s == 1) {
                 perform_ret(state);
@@ -1275,7 +1291,6 @@ int emulate_8080(state_8080_t *state) {
                 state->pc += 2;
             }
             break;
-        //TODO: Implement opcode 0xfd
         case 0xfe:
             perform_cmp(state, opcode[1]);
             state->pc += 1;
