@@ -951,7 +951,15 @@ void emulate_8080(state_8080_t *state) {
                 state->pc += 2;
             }
             break;
-        //TODO: Implement opcodes 0xf4 -> 0xf7
+        case 0xf5:
+            {
+                state->memory[state->sp - 1] = state->a;
+                uint8_t psw = (state->flags.z | state->flags.s << 1 | state->flags.p << 2 | state->flags.cy << 3 | state->flags.ac << 4);
+                state->memory[state->sp - 2] = psw;
+                state->sp -= 2;
+                break;
+            }
+        //TODO: Implement opcodes 0xf6 -> 0xf7
         case 0xf8:
             if (state->flags.s == 1) {
                 perform_ret(state);
