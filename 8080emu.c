@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include "8080emu.h"
 
-#include <_mingw_stat64.h>
-
 void unimplemented_instruction(state_8080_t *state, unsigned char opcode);
 
 uint16_t get_2byte_word(uint8_t msb, uint8_t lsb);
@@ -466,7 +464,6 @@ void emulate_8080(state_8080_t *state) {
             }
         case 0x76:
             exit(0);
-            break;
         case 0x77:
             {
                 int addr = get_2byte_word(state->h, state->l);
@@ -795,7 +792,7 @@ void emulate_8080(state_8080_t *state) {
                     uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
                 } else {
-                    state.pc += 2;
+                    state->pc += 2;
                 }
                 break;
             }
@@ -816,7 +813,7 @@ void emulate_8080(state_8080_t *state) {
                     uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
                 } else {
-                    state.pc += 2;
+                    state->pc += 2;
                 }
                 break;
             }
@@ -850,7 +847,7 @@ void emulate_8080(state_8080_t *state) {
                     uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
                 } else {
-                    state.pc += 2;
+                    state->pc += 2;
                 }
                 break;
             }
@@ -889,7 +886,7 @@ void emulate_8080(state_8080_t *state) {
                     uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
                 } else {
-                    state.pc += 2;
+                    state->pc += 2;
                 }
                 break;
             }
@@ -911,7 +908,7 @@ void emulate_8080(state_8080_t *state) {
                     uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
                 } else {
-                    state.pc += 2;
+                    state->pc += 2;
                 }
                 break;
             }
