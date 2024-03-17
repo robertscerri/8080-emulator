@@ -988,7 +988,12 @@ void emulate_8080(state_8080_t *state) {
                 state->pc += 2;
             }
             break;
-        //TODO: Implement opcodes 0xfd -> 0xff
+        //TODO: Implement opcode 0xfd
+        case 0xfe:
+            perform_cmp(state, opcode[1]);
+            state->pc += 1;
+            break;
+        //TODO: Implement opcode 0xff
         default:
             unimplemented_instruction(state, *opcode);
             break;
