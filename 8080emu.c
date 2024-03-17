@@ -1010,7 +1010,7 @@ int emulate_8080(state_8080_t *state) {
             }
             break;
         case 0xc5:
-            state->memory[state->sp] = state->c;
+            state->memory[state->sp - 2] = state->c;
             state->memory[state->sp - 1] = state->b;
             state->sp -= 2;
             break;
@@ -1059,8 +1059,8 @@ int emulate_8080(state_8080_t *state) {
             }
             break;
         case 0xd1:
-            state->d = state->memory[state->sp];
-            state->e = state->memory[state->sp + 1];
+            state->e = state->memory[state->sp];
+            state->d = state->memory[state->sp + 1];
             state->sp += 2;
             break;
         case 0xd2:
@@ -1085,8 +1085,8 @@ int emulate_8080(state_8080_t *state) {
             }
             break;
         case 0xd5:
-            state->memory[state->sp] = state->c;
-            state->memory[state->sp - 1] = state->b;
+            state->memory[state->sp - 2] = state->e;
+            state->memory[state->sp - 1] = state->d;
             state->sp -= 2;
             break;
         //TODO: Implement opcodes 0xd6 -> 0xd7
@@ -1124,8 +1124,8 @@ int emulate_8080(state_8080_t *state) {
             }
             break;
         case 0xe1:
-            state->h = state->memory[state->sp];
-            state->l = state->memory[state->sp + 1];
+            state->l = state->memory[state->sp];
+            state->h = state->memory[state->sp + 1];
             state->sp += 2;
             break;
         case 0xe2:
@@ -1157,8 +1157,8 @@ int emulate_8080(state_8080_t *state) {
             }
             break;
         case 0xe5:
-            state->memory[state->sp] = state->h;
-            state->memory[state->sp - 1] = state->l;
+            state->memory[state->sp - 2] = state->l;
+            state->memory[state->sp - 1] = state->h;
             state->sp -= 2;
             break;
         case 0xe6:
@@ -1509,11 +1509,8 @@ int main(void) {
     fread_to_mem(state, "invaders.f", 0x1000);
     fread_to_mem(state, "invaders.e", 0x1800);
 
-    int instructionsProcessed = 0;
-
-    while (done == 0 && instructionsProcessed < 110) {
+    while (done == 0) {
         done = emulate_8080(state);
-        instructionsProcessed++;
     }
 
     free(state->memory);
