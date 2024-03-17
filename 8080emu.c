@@ -14,8 +14,8 @@ void perform_stax(state_8080_t *state, const uint8_t msb, const uint8_t lsb);
 void perform_ldax(state_8080_t *state, const uint8_t msb, const uint8_t lsb);
 
 //Arithmetic Group
-void perform_inr(state_8080_t *state, const uint8_t *reg);
-void perform_dcr(state_8080_t *state, const uint8_t *reg);
+void perform_inr(state_8080_t *state, uint8_t *reg);
+void perform_dcr(state_8080_t *state, uint8_t *reg);
 void perform_inx(state_8080_t *state, uint8_t *msb, uint8_t *lsb);
 void perform_dcx(state_8080_t *state, uint8_t *msb, uint8_t *lsb);
 void perform_add(state_8080_t *state, const uint8_t operand);
@@ -1327,8 +1327,8 @@ void perform_ldax(state_8080_t *state, const uint8_t msb, const uint8_t lsb) {
     state->a = state->memory[addr];
 }
 
-void perform_inr(state_8080_t *state, const uint8_t *reg) {
-    *reg++;
+void perform_inr(state_8080_t *state, uint8_t *reg) {
+    (*reg)++;
 
     state->flags.z = *reg == 0 ? 1 : 0;
     state->flags.s = get_sign_bit(*reg);
@@ -1336,8 +1336,8 @@ void perform_inr(state_8080_t *state, const uint8_t *reg) {
     //TODO: Add auxiliary carry bit
 }
 
-void perform_dcr(state_8080_t *state, const uint8_t *reg) {
-    *reg--;
+void perform_dcr(state_8080_t *state, uint8_t *reg) {
+    (*reg)--;
 
     state->flags.z = *reg == 0 ? 1 : 0;
     state->flags.s = get_sign_bit(*reg);
@@ -1511,7 +1511,7 @@ int main(void) {
 
     int instructionsProcessed = 0;
 
-    while (done == 0) {
+    while (done == 0 && instructionsProcessed < 110) {
         done = emulate_8080(state);
         instructionsProcessed++;
     }

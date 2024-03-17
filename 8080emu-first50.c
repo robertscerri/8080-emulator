@@ -914,7 +914,7 @@ int main (int argc, char**argv)
 
     int instructionsProcessed = 0;
 
-	while (done == 0 && instructionsProcessed < 80)
+	while (done == 0 && instructionsProcessed < 110)
 	{
 		done = Emulate8080Op(state);
         instructionsProcessed++;
