@@ -13,6 +13,8 @@ int get_parity_bit(uint8_t num);
 //Arithmetic Group
 void perform_add(state_8080_t *state, const uint8_t *operand);
 void perform_adc(state_8080_t *state, const uint8_t *operand);
+void perform_sub(state_8080_t *state, const uint8_t *operand);
+void perform_sbb(state_8080_t *state, const uint8_t *operand);
 
 void unimplemented_instruction(state_8080_t *state, unsigned char opcode) {
     printf("ERROR: Unimplemented instruction (0x%02x)\n", opcode);
@@ -342,6 +344,38 @@ int emulate_8080(state_8080_t *state) {
             perform_adc(state, state->memory + get_2byte_word(state->h, state->l));
         case 0x8f:
             perform_adc(state, &state->a);
+        case 0x90:
+            perform_sub(state, &state->b);
+        case 0x91:
+            perform_sub(state, &state->c);
+        case 0x92:
+            perform_sub(state, &state->d);
+        case 0x93:
+            perform_sub(state, &state->e);
+        case 0x94:
+            perform_sub(state, &state->h);
+        case 0x95:
+            perform_sub(state, &state->l);
+        case 0x96:
+            perform_sub(state, state->memory + get_2byte_word(state->h, state->l));
+        case 0x97:
+            perform_sub(state, &state->a);
+        case 0x98:
+            perform_sbb(state, &state->b);
+        case 0x99:
+            perform_sbb(state, &state->c);
+        case 0x9a:
+            perform_sbb(state, &state->d);
+        case 0x9b:
+            perform_sbb(state, &state->e);
+        case 0x9c:
+            perform_sbb(state, &state->h);
+        case 0x9d:
+            perform_sbb(state, &state->l);
+        case 0x9e:
+            perform_sbb(state, state->memory + get_2byte_word(state->h, state->l));
+        case 0x9f:
+            perform_sbb(state, &state->a);
         default:
             unimplemented_instruction(state, *opcode);
             break;
@@ -388,5 +422,27 @@ void perform_adc(state_8080_t *state, const uint8_t *operand) {
     state->flags.s = get_sign_bit(state->a);
     state->flags.p = get_parity_bit(state->a);
     state->flags.cy = result > UINT8_MAX ? 1 : 0;
+    //TODO: Add auxiliary carry bit
+}
+
+void perform_sub(state_8080_t *state, const uint8_t *operand) {
+    uint16_t result = (uint16_t) state->a - (uint16_t) *operand;
+    state->a = (uint8_t) (result & 0xff);
+
+    state->flags.z = state->a == 0 ? 1 : 0;
+    state->flags.s = get_sign_bit(state->a);
+    state->flags.p = get_parity_bit(state->a);
+    state->flags.cy = result > UINT8_MAX ? 0 : 1; //Borrow In is complement of Carry Out //TODO: Verify correctness of this statement
+    //TODO: Add auxiliary carry bit
+}
+
+void perform_sbb(state_8080_t *state, const uint8_t *operand) {
+    uint16_t result = (uint16_t) state->a - (uint16_t) *operand - (uint16_t) state->flags.cy;
+    state->a = (uint8_t) (result & 0xff);
+
+    state->flags.z = state->a == 0 ? 1 : 0;
+    state->flags.s = get_sign_bit(state->a);
+    state->flags.p = get_parity_bit(state->a);
+    state->flags.cy = result > UINT8_MAX ? 0 : 1; //Borrow In is complement of Carry Out //TODO: Verify correctness of this statement
     //TODO: Add auxiliary carry bit
 }
