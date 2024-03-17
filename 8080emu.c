@@ -13,6 +13,8 @@ int get_parity_bit(uint8_t num);
 void perform_ldax(state_8080_t *state, const uint8_t msb, const uint8_t lsb);
 
 //Arithmetic Group
+void perform_inr(state_8080_t *state, const uint8_t *reg);
+void perform_dcr(state_8080_t *state, const uint8_t *reg);
 void perform_add(state_8080_t *state, const uint8_t operand);
 void perform_adc(state_8080_t *state, const uint8_t operand);
 void perform_sub(state_8080_t *state, const uint8_t operand);
@@ -56,20 +58,10 @@ int emulate_8080(state_8080_t *state) {
                 break;
             }
         case 0x04:
-            state->b++;
-            state->flags.z = state->b == 0;
-            state->flags.s = get_sign_bit(state->b);
-            state->flags.p = get_parity_bit(state->b);
-            //TODO: Set aux. carry bit
-            //TODO: Generic implementation for increment
+            perform_inr(state, &state->b);
             break;
         case 0x05:
-            state->b--;
-            state->flags.z = state->b == 0;
-            state->flags.s = get_sign_bit(state->b);
-            state->flags.p = get_parity_bit(state->b);
-            //TODO: Set aux. carry bit
-            //TODO: Generic implementation for decrement
+            perform_dcr(state, &state->b);
             break;
         case 0x06:
             state->b = opcode[1];
@@ -542,6 +534,24 @@ int get_parity_bit(uint8_t num) {
 void perform_ldax(state_8080_t *state, const uint8_t msb, const uint8_t lsb) {
     uint16_t addr = get_2byte_word(msb, lsb);
     state->a = state->memory[addr];
+}
+
+void perform_inr(state_8080_t *state, const uint8_t *reg) {
+    *reg++;
+
+    state->flags.z = *reg == 0 ? 1 : 0;
+    state->flags.s = get_sign_bit(*reg);
+    state->flags.p = get_parity_bit(*reg);
+    //TODO: Add auxiliary carry bit
+}
+
+void perform_dcr(state_8080_t *state, const uint8_t *reg) {
+    *reg--;
+
+    state->flags.z = *reg == 0 ? 1 : 0;
+    state->flags.s = get_sign_bit(*reg);
+    state->flags.p = get_parity_bit(*reg);
+    //TODO: Add auxiliary carry bit
 }
 
 void perform_add(state_8080_t *state, const uint8_t operand) {
