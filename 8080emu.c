@@ -393,7 +393,7 @@ void emulate_8080(state_8080_t *state) {
                 break;
             }
         case 0x76:
-            //TODO: Implement HLT instruction
+            exit(0);
             break;
         case 0x77:
             {
@@ -620,7 +620,15 @@ void emulate_8080(state_8080_t *state) {
         case 0xbf:
             perform_cmp(state, state->a);
             break;
-        //TODO: Implement opcodes 0xc0 -> 0xff
+        //TODO: Implement opcodes 0xc0 -> 0xf2
+        case 0xf3:
+            state->int_enable = 0;
+            break;
+        //TODO: Implement opcodes 0xf4 -> 0xfa
+        case 0xfb:
+            state->int_enable = 1;
+            break;
+        //TODO: Implement opcodes 0xfc -> 0xff
         default:
             unimplemented_instruction(state, *opcode);
             break;
