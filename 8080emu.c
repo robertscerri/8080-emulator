@@ -159,8 +159,29 @@ int emulate_8080(state_8080_t *state) {
             state->h = opcode[1];
             state->pc += 1;
             break;
-        //TODO: Implement opcodes 0x27 -> 0x29
-        //TODO: Implement opcodes 0x2a -> 0x3f
+        //TODO: Implement opcodes 0x27 -> 0x2a
+        case 0x2b:
+            perform_dcx(state, &state->h, &state->l);
+            break;
+        case 0x2c:
+            perform_inr(state, &state->l);
+            break;
+        case 0x2d:
+            perform_dcr(state, &state->l);
+            break;
+        case 0x2e:
+            state->l = opcode[1];
+            state->pc += 1;
+            break;
+        case 0x2f:
+            state->a = ~state->a;
+            break;
+        //TODO: Implement opcode 0x30
+        case 0x31:
+            state->sp = (opcode[2] << 8) | opcode[1];
+            state->pc += 2;
+            break;
+        //TODO: Implement opcodes 0x32 -> 0x3f
         case 0x40:
             state->b = state->b;
             break;
