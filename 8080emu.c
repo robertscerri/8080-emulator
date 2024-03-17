@@ -10,17 +10,19 @@ uint16_t get_2byte_word(uint8_t msb, uint8_t lsb);
 int get_sign_bit(uint8_t num);
 int get_parity_bit(uint8_t num);
 
+void perform_ldax(state_8080_t *state, const uint8_t msb, const uint8_t lsb);
+
 //Arithmetic Group
-void perform_add(state_8080_t *state, const uint8_t *operand);
-void perform_adc(state_8080_t *state, const uint8_t *operand);
-void perform_sub(state_8080_t *state, const uint8_t *operand);
-void perform_sbb(state_8080_t *state, const uint8_t *operand);
+void perform_add(state_8080_t *state, const uint8_t operand);
+void perform_adc(state_8080_t *state, const uint8_t operand);
+void perform_sub(state_8080_t *state, const uint8_t operand);
+void perform_sbb(state_8080_t *state, const uint8_t operand);
 
 //Logical Group
-void perform_ana(state_8080_t *state, const uint8_t *operand);
-void perform_xra(state_8080_t *state, const uint8_t *operand);
-void perform_ora(state_8080_t *state, const uint8_t *operand);
-void perform_cmp(state_8080_t *state, const uint8_t *operand);
+void perform_ana(state_8080_t *state, const uint8_t operand);
+void perform_xra(state_8080_t *state, const uint8_t operand);
+void perform_ora(state_8080_t *state, const uint8_t operand);
+void perform_cmp(state_8080_t *state, const uint8_t operand);
 
 void unimplemented_instruction(state_8080_t *state, unsigned char opcode) {
     printf("ERROR: Unimplemented instruction (0x%02x)\n", opcode);
@@ -78,7 +80,11 @@ int emulate_8080(state_8080_t *state) {
             state->flags.cy = (state->a >> 7) & 0x01;
             state->a = ((state->a << 1) && 0xff) + state->flags.cy;
             break;
-        //TODO: Implement opcodes 0x08-0x3f
+        //TODO: Implement opcode 0x09
+        case 0x0a:
+            perform_ldax(state, state->b, state->c);
+            break;
+        //TODO: Implement opcodes 0x0a -> 0x3f
         case 0x40:
             state->b = state->b;
             break;
@@ -314,197 +320,198 @@ int emulate_8080(state_8080_t *state) {
             state->a = state->a;
             break;
         case 0x80:
-            perform_add(state, &state->b);
+            perform_add(state, state->b);
             break;
         case 0x81:
-            perform_add(state, &state->c);
+            perform_add(state, state->c);
             break;
         case 0x82:
-            perform_add(state, &state->d);
+            perform_add(state, state->d);
             break;
         case 0x83:
-            perform_add(state, &state->e);
+            perform_add(state, state->e);
             break;
         case 0x84:
-            perform_add(state, &state->h);
+            perform_add(state, state->h);
             break;
         case 0x85:
-            perform_add(state, &state->l);
+            perform_add(state, state->l);
             break;
         case 0x86:
-            perform_add(state, state->memory + get_2byte_word(state->h, state->l));
+            perform_add(state, state->memory[get_2byte_word(state->h, state->l)]);
             break;
         case 0x87:
-            perform_add(state, &state->a);
+            perform_add(state, state->a);
             break;
         case 0x88:
-            perform_adc(state, &state->b);
+            perform_adc(state, state->b);
             break;
         case 0x89:
-            perform_adc(state, &state->c);
+            perform_adc(state, state->c);
             break;
         case 0x8a:
-            perform_adc(state, &state->d);
+            perform_adc(state, state->d);
             break;
         case 0x8b:
-            perform_adc(state, &state->e);
+            perform_adc(state, state->e);
             break;
         case 0x8c:
-            perform_adc(state, &state->h);
+            perform_adc(state, state->h);
             break;
         case 0x8d:
-            perform_adc(state, &state->l);
+            perform_adc(state, state->l);
             break;
         case 0x8e:
-            perform_adc(state, state->memory + get_2byte_word(state->h, state->l));
+            perform_adc(state, state->memory[get_2byte_word(state->h, state->l)]);
             break;
         case 0x8f:
-            perform_adc(state, &state->a);
+            perform_adc(state, state->a);
             break;
         case 0x90:
-            perform_sub(state, &state->b);
+            perform_sub(state, state->b);
             break;
         case 0x91:
-            perform_sub(state, &state->c);
+            perform_sub(state, state->c);
             break;
         case 0x92:
-            perform_sub(state, &state->d);
+            perform_sub(state, state->d);
             break;
         case 0x93:
-            perform_sub(state, &state->e);
+            perform_sub(state, state->e);
             break;
         case 0x94:
-            perform_sub(state, &state->h);
+            perform_sub(state, state->h);
             break;
         case 0x95:
-            perform_sub(state, &state->l);
+            perform_sub(state, state->l);
             break;
         case 0x96:
-            perform_sub(state, state->memory + get_2byte_word(state->h, state->l));
+            perform_sub(state, state->memory[get_2byte_word(state->h, state->l)]);
             break;
         case 0x97:
-            perform_sub(state, &state->a);
+            perform_sub(state, state->a);
             break;
         case 0x98:
-            perform_sbb(state, &state->b);
+            perform_sbb(state, state->b);
             break;
         case 0x99:
-            perform_sbb(state, &state->c);
+            perform_sbb(state, state->c);
             break;
         case 0x9a:
-            perform_sbb(state, &state->d);
+            perform_sbb(state, state->d);
             break;
         case 0x9b:
-            perform_sbb(state, &state->e);
+            perform_sbb(state, state->e);
             break;
         case 0x9c:
-            perform_sbb(state, &state->h);
+            perform_sbb(state, state->h);
             break;
         case 0x9d:
-            perform_sbb(state, &state->l);
+            perform_sbb(state, state->l);
             break;
         case 0x9e:
-            perform_sbb(state, state->memory + get_2byte_word(state->h, state->l));
+            perform_sbb(state, state->memory[get_2byte_word(state->h, state->l)]);
             break;
         case 0x9f:
-            perform_sbb(state, &state->a);
+            perform_sbb(state, state->a);
             break;
         case 0xa0:
-            perform_ana(state, &state->b);
+            perform_ana(state, state->b);
             break;
         case 0xa1:
-            perform_ana(state, &state->c);
+            perform_ana(state, state->c);
             break;
         case 0xa2:
-            perform_ana(state, &state->d);
+            perform_ana(state, state->d);
             break;
         case 0xa3:
-            perform_ana(state, &state->e);
+            perform_ana(state, state->e);
             break;
         case 0xa4:
-            perform_ana(state, &state->h);
+            perform_ana(state, state->h);
             break;
         case 0xa5:
-            perform_ana(state, &state->l);
+            perform_ana(state, state->l);
             break;
         case 0xa6:
-            perform_ana(state, state->memory + get_2byte_word(state->h, state->l));
+            perform_ana(state, state->memory[get_2byte_word(state->h, state->l)]);
             break;
         case 0xa7:
-            perform_ana(state, &state->a);
+            perform_ana(state, state->a);
             break;
         case 0xa8:
-            perform_xra(state, &state->b);
+            perform_xra(state, state->b);
             break;
         case 0xa9:
-            perform_xra(state, &state->c);
+            perform_xra(state, state->c);
             break;
         case 0xaa:
-            perform_xra(state, &state->d);
+            perform_xra(state, state->d);
             break;
         case 0xab:
-            perform_xra(state, &state->e);
+            perform_xra(state, state->e);
             break;
         case 0xac:
-            perform_xra(state, &state->h);
+            perform_xra(state, state->h);
             break;
         case 0xad:
-            perform_xra(state, &state->l);
+            perform_xra(state, state->l);
             break;
         case 0xae:
-            perform_xra(state, state->memory + get_2byte_word(state->h, state->l));
+            perform_xra(state, state->memory[get_2byte_word(state->h, state->l)]);
             break;
         case 0xaf:
-            perform_xra(state, &state->a);
+            perform_xra(state, state->a);
             break;
         case 0xb0:
-            perform_ora(state, &state->b);
+            perform_ora(state, state->b);
             break;
         case 0xb1:
-            perform_ora(state, &state->c);
+            perform_ora(state, state->c);
             break;
         case 0xb2:
-            perform_ora(state, &state->d);
+            perform_ora(state, state->d);
             break;
         case 0xb3:
-            perform_ora(state, &state->e);
+            perform_ora(state, state->e);
             break;
         case 0xb4:
-            perform_ora(state, &state->h);
+            perform_ora(state, state->h);
             break;
         case 0xb5:
-            perform_ora(state, &state->l);
+            perform_ora(state, state->l);
             break;
         case 0xb6:
-            perform_ora(state, state->memory + get_2byte_word(state->h, state->l));
+            perform_ora(state, state->memory[get_2byte_word(state->h, state->l)]);
             break;
         case 0xb7:
-            perform_ora(state, &state->a);
+            perform_ora(state, state->a);
             break;
         case 0xb8:
-            perform_cmp(state, &state->b);
+            perform_cmp(state, state->b);
             break;
         case 0xb9:
-            perform_cmp(state, &state->c);
+            perform_cmp(state, state->c);
             break;
         case 0xba:
-            perform_cmp(state, &state->d);
+            perform_cmp(state, state->d);
             break;
         case 0xbb:
-            perform_cmp(state, &state->e);
+            perform_cmp(state, state->e);
             break;
         case 0xbc:
-            perform_cmp(state, &state->h);
+            perform_cmp(state, state->h);
             break;
         case 0xbd:
-            perform_cmp(state, &state->l);
+            perform_cmp(state, state->l);
             break;
         case 0xbe:
-            perform_cmp(state, state->memory + get_2byte_word(state->h, state->l));
+            perform_cmp(state, state->memory[get_2byte_word(state->h, state->l)]);
             break;
         case 0xbf:
-            perform_cmp(state, &state->a);
+            perform_cmp(state, state->a);
             break;
+        //TODO: Implement opcodes 0xc0 -> 0xff
         default:
             unimplemented_instruction(state, *opcode);
             break;
@@ -532,8 +539,13 @@ int get_parity_bit(uint8_t num) {
     return parity;
 }
 
-void perform_add(state_8080_t *state, const uint8_t *operand) {
-    uint16_t result = (uint16_t) state->a + (uint16_t) *operand;
+void perform_ldax(state_8080_t *state, const uint8_t msb, const uint8_t lsb) {
+    uint16_t addr = get_2byte_word(msb, lsb);
+    state->a = state->memory[addr];
+}
+
+void perform_add(state_8080_t *state, const uint8_t operand) {
+    uint16_t result = (uint16_t) state->a + (uint16_t) operand;
     state->a = (uint8_t) (result & 0xff);
 
     state->flags.z = state->a == 0 ? 1 : 0;
@@ -543,8 +555,8 @@ void perform_add(state_8080_t *state, const uint8_t *operand) {
     //TODO: Add auxiliary carry bit
 }
 
-void perform_adc(state_8080_t *state, const uint8_t *operand) {
-    uint16_t result = (uint16_t) state->a + (uint16_t) *operand + (uint16_t) state->flags.cy;
+void perform_adc(state_8080_t *state, const uint8_t operand) {
+    uint16_t result = (uint16_t) state->a + (uint16_t) operand + (uint16_t) state->flags.cy;
     state->a = (uint8_t) (result & 0xff);
 
     state->flags.z = state->a == 0 ? 1 : 0;
@@ -554,8 +566,8 @@ void perform_adc(state_8080_t *state, const uint8_t *operand) {
     //TODO: Add auxiliary carry bit
 }
 
-void perform_sub(state_8080_t *state, const uint8_t *operand) {
-    uint16_t result = (uint16_t) state->a - (uint16_t) *operand;
+void perform_sub(state_8080_t *state, const uint8_t operand) {
+    uint16_t result = (uint16_t) state->a - (uint16_t) operand;
     state->a = (uint8_t) (result & 0xff);
 
     state->flags.z = state->a == 0 ? 1 : 0;
@@ -565,8 +577,8 @@ void perform_sub(state_8080_t *state, const uint8_t *operand) {
     //TODO: Add auxiliary carry bit
 }
 
-void perform_sbb(state_8080_t *state, const uint8_t *operand) {
-    uint16_t result = (uint16_t) state->a - (uint16_t) *operand - (uint16_t) state->flags.cy;
+void perform_sbb(state_8080_t *state, const uint8_t operand) {
+    uint16_t result = (uint16_t) state->a - (uint16_t) operand - (uint16_t) state->flags.cy;
     state->a = (uint8_t) (result & 0xff);
 
     state->flags.z = state->a == 0 ? 1 : 0;
@@ -576,8 +588,8 @@ void perform_sbb(state_8080_t *state, const uint8_t *operand) {
     //TODO: Add auxiliary carry bit
 }
 
-void perform_ana(state_8080_t *state, const uint8_t *operand) {
-    state->a = state->a & *operand;
+void perform_ana(state_8080_t *state, const uint8_t operand) {
+    state->a = state->a & operand;
     state->flags.z = state->a == 0 ? 1 : 0;
     state->flags.s = get_sign_bit(state->a);
     state->flags.p = get_parity_bit(state->a);
@@ -585,8 +597,8 @@ void perform_ana(state_8080_t *state, const uint8_t *operand) {
     //TODO: Add auxiliary carry bit
 }
 
-void perform_xra(state_8080_t *state, const uint8_t *operand) {
-    state->a = state->a ^ *operand;
+void perform_xra(state_8080_t *state, const uint8_t operand) {
+    state->a = state->a ^ operand;
     state->flags.z = state->a == 0 ? 1 : 0;
     state->flags.s = get_sign_bit(state->a);
     state->flags.p = get_parity_bit(state->a);
@@ -594,8 +606,8 @@ void perform_xra(state_8080_t *state, const uint8_t *operand) {
     //TODO: Add auxiliary carry bit
 }
 
-void perform_ora(state_8080_t *state, const uint8_t *operand) {
-    state->a = state->a | *operand;
+void perform_ora(state_8080_t *state, const uint8_t operand) {
+    state->a = state->a | operand;
     state->flags.z = state->a == 0 ? 1 : 0;
     state->flags.s = get_sign_bit(state->a);
     state->flags.p = get_parity_bit(state->a);
@@ -603,8 +615,8 @@ void perform_ora(state_8080_t *state, const uint8_t *operand) {
     //TODO: Add auxiliary carry bit
 }
 
-void perform_cmp(state_8080_t *state, const uint8_t *operand) {
-    uint16_t result = (uint16_t) state->a - (uint16_t) *operand;
+void perform_cmp(state_8080_t *state, const uint8_t operand) {
+    uint16_t result = (uint16_t) state->a - (uint16_t) operand;
 
     state->flags.z = (result & 0xff) == 0 ? 1 : 0;
     state->flags.s = get_sign_bit((result & 0xff));
