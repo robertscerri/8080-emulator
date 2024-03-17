@@ -3,8 +3,4 @@ project(8080Disassembler C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(8080Disassembler 8080dis.c
-        8080emu.h
-)
-add_executable(8080Emulator 8080emu.c 8080dis.c)
-add_executable(8080EmulatorTutorial 8080emu-first50.c)
+add_executable(8080Emulator 8080emu.c)
