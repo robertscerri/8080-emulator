@@ -689,10 +689,15 @@ void emulate_8080(state_8080_t *state) {
         case 0xbf:
             perform_cmp(state, state->a);
             break;
-        //TODO: Implement opcodes 0xc0 -> 0xc1
+        //TODO: Implement opcode 0xc0
+        case 0xc1:
+            state->c = state->memory[state->sp];
+            state->b = state->memory[state->sp + 1];
+            state->sp += 2;
+            break;
         case 0xc2:
             {
-                if (state->flags.z != 0) {
+                if (state->flags.z == 0) {
                     uint16_t addr = opcode[1] | (opcode[2] << 8);
                     state->pc = addr;
                 }
@@ -704,20 +709,112 @@ void emulate_8080(state_8080_t *state) {
                 state->pc = addr;
                 break;
             }
-        //TODO: Implement opcodes 0xc4 -> 0xc9
-        case 0xc9:
+        //TODO: Implement opcode 0xc4
+        case 0xc5:
+            state->memory[state->sp] = state->c;
+            state->memory[state->sp - 1] = state->b;
+            state->sp -= 2;
+            break;
+        //TODO: Implement opcodes 0xc6 -> 0xc9
+        case 0xca:
             {
-                if (state->flags.z == 0) {
+                if (state->flags.z == 1) {
                     uint16_t addr = opcode[1] | (opcode[2] << 8);
                     state->pc = addr;
                 }
                 break;
             }
-        //TODO: Implement opcodes 0xcb -> 0xf2
+        //TODO: Implement opcodes 0xcb -> 0xd0
+        case 0xd1:
+            state->d = state->memory[state->sp];
+            state->e = state->memory[state->sp + 1];
+            state->sp += 2;
+            break;
+        case 0xd2:
+            {
+                if (state->flags.cy == 0) {
+                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    state->pc = addr;
+                }
+                break;
+            }
+        //TODO: Implement opcodes 0xd3 -> 0xd4
+        case 0xd5:
+            state->memory[state->sp] = state->c;
+            state->memory[state->sp - 1] = state->b;
+            state->sp -= 2;
+            break;
+        //TODO: Implement opcodes 0xd6 -> 0xd9
+        case 0xda:
+            {
+                if (state->flags.cy == 1) {
+                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    state->pc = addr;
+                }
+                break;
+            }
+        //TODO: Implement opcodes 0xdb -> 0xe0
+        case 0xe1:
+            state->h = state->memory[state->sp];
+            state->l = state->memory[state->sp + 1];
+            state->sp += 2;
+            break;
+        case 0xe2:
+            {
+                if (state->flags.p == 0) {
+                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    state->pc = addr;
+                }
+                break;
+            }
+        //TODO: Implement opcodes 0xe3 -> 0xe4
+        case 0xe5:
+            state->memory[state->sp] = state->h;
+            state->memory[state->sp - 1] = state->l;
+            state->sp -= 2;
+            break;
+        //TODO: Implement opcodes 0xe6 -> 0xe9
+        case 0xea:
+            {
+                if (state->flags.p == 1) {
+                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    state->pc = addr;
+                }
+                break;
+            }
+        //TODO: Implement opcodes 0xeb -> 0xf0
+        case 0xf1:
+            {
+                uint8_t psw = state->memory[state->sp];
+                state->flags.z = (0x01 == (psw & 0x01));
+                state->flags.s = (0x02 == (psw & 0x02));
+                state->flags.p = (0x04 == (psw & 0x04));
+                state->flags.cy = (0x08 == (psw & 0x08));
+                state->flags.ac = (0x10 == (psw & 0x10));
+                state->a = state->memory[state->sp + 1];
+                state->sp += 2;
+                break;
+            }
+        case 0xf2:
+            {
+                if (state->flags.s == 0) {
+                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    state->pc = addr;
+                }
+                break;
+            }
         case 0xf3:
             state->int_enable = 0;
             break;
-        //TODO: Implement opcodes 0xf4 -> 0xfa
+        //TODO: Implement opcodes 0xf4 -> 0xf9
+        case 0xfa:
+            {
+                if (state->flags.s == 1) {
+                    uint16_t addr = opcode[1] | (opcode[2] << 8);
+                    state->pc = addr;
+                }
+                break;
+            }
         case 0xfb:
             state->int_enable = 1;
             break;
