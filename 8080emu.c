@@ -34,7 +34,7 @@ void unimplemented_instruction(state_8080_t *state, unsigned char opcode) {
     exit(1);
 }
 
-int emulate_8080(state_8080_t *state) {
+void emulate_8080(state_8080_t *state) {
     unsigned char *opcode = &state->memory[state->pc];
 
     switch(*opcode) {
