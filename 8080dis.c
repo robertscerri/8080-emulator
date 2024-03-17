@@ -3,29 +3,29 @@
 
 int disassemble_8080(unsigned char *buff, int pc);
 
-int main(int argc, char **argv) {
-    FILE *f = fopen(argv[1], "rb");
-    if (f == NULL) {
-        printf("ERROR: Couldn't open %s\n", argv[1]);
-        exit(1);
-    }
-
-    fseek(f, 0, SEEK_END);
-    int fsize = ftell(f);
-    fseek(f, 0, SEEK_SET);
-
-    unsigned char *buff = malloc(fsize);
-    fread(buff, fsize, 1, f);
-    fclose(f);
-
-    int pc = 0;
-
-    while (pc < fsize) {
-        pc += disassemble_8080(buff, pc);
-    }
-
-    return 0;
-}
+//int main(int argc, char **argv) {
+//    FILE *f = fopen(argv[1], "rb");
+//    if (f == NULL) {
+//        printf("ERROR: Couldn't open %s\n", argv[1]);
+//        exit(1);
+//    }
+//
+//    fseek(f, 0, SEEK_END);
+//    int fsize = ftell(f);
+//    fseek(f, 0, SEEK_SET);
+//
+//    unsigned char *buff = malloc(fsize);
+//    fread(buff, fsize, 1, f);
+//    fclose(f);
+//
+//    int pc = 0;
+//
+//    while (pc < fsize) {
+//        pc += disassemble_8080(buff, pc);
+//    }
+//
+//    return 0;
+//}
 
 int disassemble_8080(unsigned char *buff, int pc) {
     unsigned char *code = &buff[pc];
@@ -281,6 +281,7 @@ int disassemble_8080(unsigned char *buff, int pc) {
         default: printf("NOP"); break;
     }
 
+    printf("\t[%02x]", *code);
     printf("\n");
     return op_bytes;
 }
