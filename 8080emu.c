@@ -767,7 +767,18 @@ void emulate_8080(state_8080_t *state) {
                 }
                 break;
             }
-        //TODO: Implement opcodes 0xe3 -> 0xe4
+        case 0xe3:
+            {
+                int temp = state->memory[state->sp];
+                state->memory[state->sp] = state->l;
+                state->l = temp;
+
+                temp = state->memory[state->sp + 1];
+                state->memory[state->sp + 1] = state->h;
+                state->h = temp;
+                break;
+            }
+        //TODO: Implement opcode -> 0xe4
         case 0xe5:
             state->memory[state->sp] = state->h;
             state->memory[state->sp - 1] = state->l;
@@ -806,7 +817,10 @@ void emulate_8080(state_8080_t *state) {
         case 0xf3:
             state->int_enable = 0;
             break;
-        //TODO: Implement opcodes 0xf4 -> 0xf9
+        //TODO: Implement opcodes 0xf4 -> 0xf8
+        case 0xf9:
+            state->sp = get_2byte_word(state->h, state->l);
+            break;
         case 0xfa:
             {
                 if (state->flags.s == 1) {
