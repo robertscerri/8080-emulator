@@ -445,8 +445,8 @@ int emulate_8080(state_8080_t *state) {
             }
         //TODO: Implement opcode 0x20 (RIM)
         case 0x21:
-            state->h = opcode[1];
-            state->l = opcode[2];
+            state->h = opcode[2];
+            state->l = opcode[1];
             state->pc += 2;
             break;
         case 0x22:
@@ -1511,7 +1511,7 @@ int main(void) {
 
     int instructionsProcessed = 0;
 
-    while (done == 0 && instructionsProcessed < 50) {
+    while (done == 0) {
         done = emulate_8080(state);
         instructionsProcessed++;
     }
