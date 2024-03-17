@@ -10,6 +10,7 @@ uint16_t get_2byte_word(uint8_t msb, uint8_t lsb);
 int get_sign_bit(uint8_t num);
 int get_parity_bit(uint8_t num);
 
+void perform_stax(state_8080_t *state, const uint8_t msb, const uint8_t lsb);
 void perform_ldax(state_8080_t *state, const uint8_t msb, const uint8_t lsb);
 
 //Arithmetic Group
@@ -44,11 +45,8 @@ int emulate_8080(state_8080_t *state) {
             state->pc += 2;
             break;
         case 0x02:
-            {
-                uint16_t addr = get_2byte_word(state->b, state->c);
-                state->memory[addr] = state->a;
-                break;
-            }
+            perform_stax(state, state->b, state->c);
+            break;
         case 0x03:
             perform_inx(state, &state->b, &state->c);
             break;
@@ -536,6 +534,11 @@ int get_parity_bit(uint8_t num) {
     }
 
     return parity;
+}
+
+void perform_stax(state_8080_t *state, const uint8_t msb, const uint8_t lsb) {
+    uint16_t addr = get_2byte_word(msb, lsb);
+    state->memory[addr] = state->a;
 }
 
 void perform_ldax(state_8080_t *state, const uint8_t msb, const uint8_t lsb) {
