@@ -38,7 +38,7 @@ void unimplemented_instruction(state_8080_t *state, unsigned char opcode) {
     exit(1);
 }
 
-void emulate_8080(state_8080_t *state) {
+int emulate_8080(state_8080_t *state) {
     unsigned char *opcode = &state->memory[state->pc];
 
     switch(*opcode) {
@@ -463,7 +463,7 @@ void emulate_8080(state_8080_t *state) {
                 break;
             }
         case 0x76:
-            exit(0);
+            return 1;
         case 0x77:
             {
                 int addr = get_2byte_word(state->h, state->l);
@@ -1000,6 +1000,14 @@ void emulate_8080(state_8080_t *state) {
     }
 
     state->pc++;
+
+    printf("\tC=%d,P=%d,S=%d,Z=%d\n", state->flags.cy, state->flags.p,
+           state->flags.s, state->flags.z);
+    printf("\tA $%02x B $%02x C $%02x D $%02x E $%02x H $%02x L $%02x SP %04x\n",
+        state->a, state->b, state->c, state->d,
+        state->e, state->h, state->l, state->sp);
+
+    return 0;
 }
 
 uint16_t get_2byte_word(uint8_t msb, uint8_t lsb) {
@@ -1169,4 +1177,56 @@ void perform_call(state_8080_t *state, uint16_t addr) {
     state->memory[state->sp - 2] = (state->pc & 0xff);
     state->sp += 2;
     state->pc = addr;
+}
+
+void fread_to_mem(state_8080_t *state, char *filename, uint32_t offset) {
+    FILE *f = fopen(filename, "rb");
+    if (f == NULL) {
+        printf("ERROR: Couldn't open %s\n", filename);
+        exit(1);
+    }
+
+    fseek(f, 0, SEEK_END);
+    int fsize = ftell(f);
+    fseek(f, 0, SEEK_SET);
+
+    uint8_t *buffer = &state->memory[offset];
+    fread(buffer, fsize, 1, f);
+    fclose(f);
+}
+
+state_8080_t *init8080(void) {
+    state_8080_t *state = calloc(1, sizeof(state_8080_t));
+    if (state == NULL) {
+        printf("ERROR: Couldn't initialise state");
+        exit(1);
+    }
+
+    state->memory = malloc(0x10000);
+    if (state->memory == NULL) {
+        printf("ERROR: Couldn't initialise memory");
+        exit(1);
+    }
+
+    return state;
+}
+
+int main(void) {
+    int done = 0;
+    state_8080_t *state = init8080();
+
+    fread_to_mem(state, "invaders.h", 0);
+    fread_to_mem(state, "invaders.g", 0x0800);
+    fread_to_mem(state, "invaders.f", 0x1000);
+    fread_to_mem(state, "invaders.e", 0x1600);
+
+    while (done == 0) {
+        done = emulate_8080(state);
+    }
+
+
+    free(state->memory);
+    free(state);
+
+    return 0;
 }
