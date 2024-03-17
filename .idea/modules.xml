@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/8080-emulator.iml" filepath="$PROJECT_DIR$/.idea/8080-emulator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/8080Disassembler.iml" filepath="$PROJECT_DIR$/.idea/8080Disassembler.iml" />
     </modules>
   </component>
 </project>
