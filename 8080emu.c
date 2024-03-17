@@ -707,6 +707,8 @@ void emulate_8080(state_8080_t *state) {
                 if (state->flags.z == 0) {
                     uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
+                } else {
+                    state->pc += 2;
                 }
                 break;
             }
@@ -740,6 +742,8 @@ void emulate_8080(state_8080_t *state) {
                 if (state->flags.z == 1) {
                     uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
+                } else {
+                    state->pc += 2;
                 }
                 break;
             }
@@ -767,6 +771,8 @@ void emulate_8080(state_8080_t *state) {
                 if (state->flags.cy == 0) {
                     uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
+                } else {
+                    state->pc += 2;
                 }
                 break;
             }
@@ -788,6 +794,8 @@ void emulate_8080(state_8080_t *state) {
                 if (state->flags.cy == 1) {
                     uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
+                } else {
+                    state.pc += 2;
                 }
                 break;
             }
@@ -807,6 +815,8 @@ void emulate_8080(state_8080_t *state) {
                 if (state->flags.p == 0) {
                     uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
+                } else {
+                    state.pc += 2;
                 }
                 break;
             }
@@ -839,6 +849,8 @@ void emulate_8080(state_8080_t *state) {
                 if (state->flags.p == 1) {
                     uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
+                } else {
+                    state.pc += 2;
                 }
                 break;
             }
@@ -876,6 +888,8 @@ void emulate_8080(state_8080_t *state) {
                 if (state->flags.s == 0) {
                     uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
+                } else {
+                    state.pc += 2;
                 }
                 break;
             }
@@ -896,6 +910,8 @@ void emulate_8080(state_8080_t *state) {
                 if (state->flags.s == 1) {
                     uint16_t addr = get_2byte_word(opcode[2], opcode[1]);
                     state->pc = addr;
+                } else {
+                    state.pc += 2;
                 }
                 break;
             }
