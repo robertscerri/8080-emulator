@@ -1,5 +1,5 @@
-#ifndef INC_8080DISASSEMBLER_8080EMU_H
-#define INC_8080DISASSEMBLER_8080EMU_H
+#ifndef INC_8080EMULATOR_8080EMU_H
+#define INC_8080EMULATOR_8080EMU_H
 
 #include <stdint.h>
 
@@ -27,4 +27,4 @@ typedef struct state_8080 {
     uint8_t int_enable;
 } state_8080_t;
 
-#endif //INC_8080DISASSEMBLER_8080EMU_H
+#endif //INC_8080EMULATOR_8080EMU_H
