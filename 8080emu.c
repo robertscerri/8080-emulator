@@ -15,6 +15,8 @@ void perform_ldax(state_8080_t *state, const uint8_t msb, const uint8_t lsb);
 //Arithmetic Group
 void perform_inr(state_8080_t *state, const uint8_t *reg);
 void perform_dcr(state_8080_t *state, const uint8_t *reg);
+void perform_inx(state_8080_t *state, uint8_t *msb, uint8_t *lsb);
+void perform_dcx(state_8080_t *state, uint8_t *msb, uint8_t *lsb);
 void perform_add(state_8080_t *state, const uint8_t operand);
 void perform_adc(state_8080_t *state, const uint8_t operand);
 void perform_sub(state_8080_t *state, const uint8_t operand);
@@ -48,15 +50,8 @@ int emulate_8080(state_8080_t *state) {
                 break;
             }
         case 0x03:
-            {
-                uint16_t temp = get_2byte_word(state->b, state->c);
-                temp++;
-
-                state->b = (temp >> 8) & 0xff;
-                state->c = temp & 0xff;
-
-                break;
-            }
+            perform_inx(state, &state->b, &state->c);
+            break;
         case 0x04:
             perform_inr(state, &state->b);
             break;
@@ -66,7 +61,6 @@ int emulate_8080(state_8080_t *state) {
         case 0x06:
             state->b = opcode[1];
             state->pc += 1;
-            //TODO: Generic implementation for MVI
             break;
         case 0x07:
             state->flags.cy = (state->a >> 7) & 0x01;
@@ -76,7 +70,20 @@ int emulate_8080(state_8080_t *state) {
         case 0x0a:
             perform_ldax(state, state->b, state->c);
             break;
-        //TODO: Implement opcodes 0x0a -> 0x3f
+        case 0x0b:
+            perform_dcx(state, &state->b, &state->c);
+            break;
+        case 0x0c:
+            perform_inr(state, &state->c);
+            break;
+        case 0x0d:
+            perform_dcr(state, &state->c);
+            break;
+        case 0x0e:
+            state->c = opcode[1];
+            state->pc += 1;
+            break;
+        //TODO: Implement opcodes 0x0f -> 0x3f
         case 0x40:
             state->b = state->b;
             break;
@@ -552,6 +559,22 @@ void perform_dcr(state_8080_t *state, const uint8_t *reg) {
     state->flags.s = get_sign_bit(*reg);
     state->flags.p = get_parity_bit(*reg);
     //TODO: Add auxiliary carry bit
+}
+
+void perform_inx(state_8080_t *state, uint8_t *msb, uint8_t *lsb) {
+    uint16_t result = get_2byte_word(state->b, state->c);
+    result++;
+
+    *msb = (result >> 8) & 0xff;
+    *lsb = result & 0xff;
+}
+
+void perform_dcx(state_8080_t *state, uint8_t *msb, uint8_t *lsb) {
+    uint16_t result = get_2byte_word(state->b, state->c);
+    result--;
+
+    *msb = (result >> 8) & 0xff;
+    *lsb = result & 0xff;
 }
 
 void perform_add(state_8080_t *state, const uint8_t operand) {
